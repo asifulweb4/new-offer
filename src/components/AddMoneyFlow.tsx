@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion'; // এখানে 'motion/react' থেকে 'framer-motion' স্ট্যান্ডার্ড করা হয়েছে
 import { ShieldCheck, Crown, Copy, Check, Info, Coins, Send } from 'lucide-react';
 import { User, Transaction } from '../types';
 
@@ -10,36 +10,39 @@ interface AddMoneyFlowProps {
 }
 
 export default function AddMoneyFlow({ user, onAddMoneySuccess, onBack }: AddMoneyFlowProps) {
-  const [activeTab, setActiveTab] = useState<'personal' | 'business'>('business');
-  const [copiedNumber, setCopiedNumber] = useState(false);
+  const [activeTab, setActiveTab] = useState<'personal' | 'business'>('personal'); // Default 'personal' স্ক্রিনশটের সাথে মিল রেখে
+  const [selectedMethod, setSelectedMethod] = useState<'bkash' | 'nagad'>('bkash');
+  const [copiedType, setCopiedType] = useState<'bkash' | 'nagad' | null>(null);
   const [amount, setAmount] = useState('');
   const [txId, setTxId] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
 
-  // Mobile Financial Service credentials in Bangladesh
-  const walletDetails = {
+  // স্ক্রিনশট অনুযায়ী ডাইনামিক ডেটা অবজেক্ট
+  const dataConfig = {
     personal: {
-      gateway: 'BKASH (PERSONAL)',
-      phone: '01333858547',
-      minAmount: 500,
-      minAmountBn: '৫০০',
+      minAmount: 550,
+      minAmountBn: '৫৫০',
+      subAdminAmountBn: '৩,১৫০',
+      bkashPhone: '01333858547',
+      nagadPhone: '01747156607',
     },
     business: {
-      gateway: 'NAGAD (PERSONAL)',
-      phone: '01747156607',
-      minAmount: 1450,
-      minAmountBn: '১,৪৫০',
-    },
+      minAmount: 1550,
+      minAmountBn: '১,৫৫০',
+      subAdminAmountBn: '৩,১৫০',
+      bkashPhone: '01333858547', // প্রয়োজন অনুযায়ী পরিবর্তন করতে পারেন
+      nagadPhone: '01747156607',
+    }
   };
 
-  const activeWallet = walletDetails[activeTab];
+  const currentData = dataConfig[activeTab];
 
-  const handleCopy = (text: string) => {
+  const handleCopy = (text: string, type: 'bkash' | 'nagad') => {
     navigator.clipboard.writeText(text);
-    setCopiedNumber(true);
+    setCopiedType(type);
     setTimeout(() => {
-      setCopiedNumber(false);
+      setCopiedType(null);
     }, 2000);
   };
 
@@ -55,8 +58,8 @@ export default function AddMoneyFlow({ user, onAddMoneySuccess, onBack }: AddMon
       return;
     }
 
-    if (parsedAmount < activeWallet.minAmount) {
-      setErrorMsg(`দুঃখিত! ${activeTab === 'business' ? 'বিজনেস' : 'পার্সোনাল'} অ্যাকাউন্টের জন্য সর্বনিম্ন ৳${activeWallet.minAmount} অ্যাড করতে হবে।`);
+    if (parsedAmount < currentData.minAmount) {
+      setErrorMsg(`দুঃখিত! ${activeTab === 'business' ? 'বিজনেস' : 'পার্সোনাল'} অ্যাকাউন্টের জন্য সর্বনিম্ন ৳${currentData.minAmount} অ্যাড করতে হবে।`);
       return;
     }
 
@@ -70,47 +73,41 @@ export default function AddMoneyFlow({ user, onAddMoneySuccess, onBack }: AddMon
       return;
     }
 
+    const gatewayName = selectedMethod === 'bkash' ? 'BKASH (PERSONAL)' : 'NAGAD (PERSONAL)';
+
     // Success Simulation
-    onAddMoneySuccess(parsedAmount, `${activeWallet.gateway} পেমেন্ট ভেরিফিকেশন`, txId);
-    setSuccessMsg(`অভিনন্দন! আপনার ব্যালেন্সে সফলভাবে ৳${parsedAmount} যোগ হয়েছে।`);
+    onAddMoneySuccess(parsedAmount, `${gatewayName} পেমেন্ট ভেরিফিকেশন`, txId);
+    setSuccessMsg(`অভিনন্দন! আপনার ব্যালেন্সে সফলভাবে ৳${parsedAmount} যোগ হয়েছে।`);
     setAmount('');
     setTxId('');
   };
 
   return (
     <div className="max-w-xl mx-auto space-y-6 font-sans">
-      {/* Header Info Banner matching screenshot text */}
-      <div className="text-center bg-gradient-to-r from-purple-100/50 via-pink-100/40 to-rose-100/50 p-4 rounded-3xl border border-purple-100/50">
-        <p className="text-sm font-extrabold text-[#3a206a] leading-relaxed">
-          আপনার অ্যাকাউন্টে ব্যালেন্স যোগ করতে নিচের ফর্মটি পূরণ করুন
-        </p>
-      </div>
 
       {/* Mode Tabs matching screenshot UI */}
       <div className="grid grid-cols-2 gap-3.5 bg-slate-100/70 p-2 rounded-2xl">
         <button
           onClick={() => { setActiveTab('personal'); setErrorMsg(''); }}
-          className={`py-3 px-4 font-bold text-sm rounded-xl transition-all duration-300 ${
-            activeTab === 'personal'
-              ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-md'
-              : 'text-slate-600 hover:bg-slate-50'
-          }`}
+          className={`py-3 px-4 font-bold text-sm rounded-xl transition-all duration-300 ${activeTab === 'personal'
+            ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-md'
+            : 'text-slate-600 hover:bg-slate-50'
+            }`}
         >
           Personal Account
         </button>
         <button
           onClick={() => { setActiveTab('business'); setErrorMsg(''); }}
-          className={`py-3 px-4 font-bold text-sm rounded-xl transition-all duration-300 ${
-            activeTab === 'business'
-              ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-md'
-              : 'text-slate-600 hover:bg-slate-50'
-          }`}
+          className={`py-3 px-4 font-bold text-sm rounded-xl transition-all duration-300 ${activeTab === 'business'
+            ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-md'
+            : 'text-slate-600 hover:bg-slate-50'
+            }`}
         >
           Business Account
         </button>
       </div>
 
-      {/* Support Instant Added banner matching screenshot light green box */}
+      {/* Support Instant Added banner */}
       <div className="bg-[#effdf5] border border-emerald-100 rounded-3xl p-4.5 flex items-start gap-3.5 shadow-sm">
         <div className="w-10 h-10 rounded-full bg-emerald-100 text-[#00a86b] flex items-center justify-center shrink-0 shadow-inner">
           <ShieldCheck size={22} />
@@ -125,18 +122,17 @@ export default function AddMoneyFlow({ user, onAddMoneySuccess, onBack }: AddMon
         </div>
       </div>
 
-      {/* Main card box matching screenshot block */}
+      {/* Main card box showing minimum amount based on active tab */}
       <div className="bg-white rounded-3xl p-6 border border-purple-50 shadow-md space-y-4 text-center">
         <p className="text-[11px] font-bold uppercase tracking-wider text-pink-500">
           সর্বনিম্ন রিকোয়ারমেন্ট
         </p>
-        
         <div className="space-y-1">
           <p className="text-sm font-semibold text-slate-500">
             {activeTab === 'business' ? 'Business' : 'Personal'} অ্যাকাউন্টের জন্য সর্বনিম্ন
           </p>
           <p className="text-3xl font-black bg-gradient-to-r from-purple-700 via-pink-600 to-rose-500 bg-clip-text text-transparent">
-            {activeWallet.minAmountBn} টাকা
+            {currentData.minAmountBn} টাকা
           </p>
           <p className="text-xs font-bold text-slate-400 mt-0.5">
             অ্যাড করতে হবে
@@ -144,54 +140,89 @@ export default function AddMoneyFlow({ user, onAddMoneySuccess, onBack }: AddMon
         </div>
       </div>
 
-      {/* Golden opportunitiies / Sub Admin Promo card matching screen */}
+      {/* Sub Admin Promo card */}
       <div className="bg-gradient-to-r from-[#211749] via-[#3a1c71] to-[#6a3093] text-white rounded-3xl p-5 shadow-xl relative overflow-hidden flex items-start gap-4">
-        {/* Floating background glowing ball */}
         <div className="absolute top-0 right-0 w-24 h-24 bg-pink-500/10 blur-xl rounded-full" />
-        
         <div className="w-11 h-11 rounded-2xl bg-white/15 text-yellow-300 flex items-center justify-center shrink-0 border border-white/10 shadow-lg">
-          <Crown size={22} className="animate-bounce" />
+          <Crown size={22} />
         </div>
-        
         <div className="space-y-1.5 flex-1 z-10">
           <h4 className="font-extrabold text-white text-sm tracking-wide flex items-center gap-1.5">
-            সাব এডমিন হওয়ার সুযোগ!
+            সাব এডমিন হওয়ার সুযোগ!
           </h4>
           <p className="text-xs text-purple-200/90 leading-relaxed font-semibold">
-            আমাদের অ্যাকাউন্টে <span className="py-0.5 px-1.5 rounded bg-purple-100/20 text-white">সাব এডমিন</span> নিতে চাইলে মাত্র <span className="underline decoration-pink-400 font-extrabold">২,৯৫০ ৳</span> একবার যোগ করুন — সারাজীবন সর্বোচ্চ ব্যবসা ও ডাবল কমিশন সুবিধা উপভোগ করুন।
+            আমাদের অ্যাকাউন্টে <span className="py-0.5 px-1.5 rounded bg-purple-100/20 text-white">সাব এডমিন</span> নিতে চাইলে মাত্র <span className="underline decoration-pink-400 font-extrabold">{currentData.subAdminAmountBn} ৳</span> একবার যোগ করুন — সারাজীবন সর্বোচ্চ ব্যবসা ও ডাবল কমিশন সুবিধা উপভোগ করুন।
           </p>
         </div>
       </div>
 
-      {/* MFS copy address & validation block */}
+      {/* MFS side-by-side display & validation block */}
       <div className="bg-white rounded-3xl p-6 border border-purple-50 shadow-md space-y-5">
-        <div className="text-center pb-2 border-b border-purple-50">
-          <span className="text-xs font-bold text-purple-700 uppercase tracking-widest block mb-1">প্রথমে টাকা সেন্ডমানি বা ক্যাশ ইন করুন</span>
-          <div className="py-2.5 px-4 rounded-2xl bg-rose-50 text-rose-600 text-sm font-black tracking-wide inline-flex items-center gap-2">
-            <span>{activeWallet.gateway}</span>
-            <span className="text-xs p-1 bg-rose-100 text-rose-700 rounded-lg">PERSONAL</span>
-          </div>
-        </div>
 
-        {/* Copy Wallet Phone Input */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3.5 p-4.5 bg-slate-50 border border-slate-100 rounded-2xl">
-          <div className="text-center sm:text-left space-y-0.5">
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">সেন্ডমানি করার নম্বর</span>
-            <span className="text-lg font-black tracking-wider text-slate-800">{activeWallet.phone}</span>
-          </div>
-
-          <div className="flex gap-2">
+        {/* বিকাশ এবং নগদ নম্বর পাশাপাশি প্রদর্শনের জন্য গ্রিড লেআউট */}
+        <div className="grid grid-cols-2 gap-3">
+          {/* bKash Card */}
+          <div className="p-3 bg-white border border-pink-100 rounded-2xl shadow-sm space-y-2">
+            <div className="text-[10px] font-black text-pink-600 tracking-wide uppercase">
+              BKASH [PERSONAL]
+            </div>
+            <div className="text-sm font-black text-slate-800 tracking-tight">
+              {currentData.bkashPhone}
+            </div>
             <button
-              onClick={() => handleCopy(activeWallet.phone)}
-              className="py-2.5 px-4 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 bg-white hover:bg-slate-50 active:scale-95 transition-all flex items-center gap-1.5 shadow-sm"
+              type="button"
+              onClick={() => handleCopy(currentData.bkashPhone, 'bkash')}
+              className="w-full py-1.5 px-2 rounded-xl border border-pink-100 text-[11px] font-bold text-pink-600 bg-pink-50/50 flex items-center justify-center gap-1 active:scale-95 transition-all"
             >
-              {copiedNumber ? <Check size={14} className="text-emerald-500" /> : <Copy size={14} />}
-              {copiedNumber ? 'কপি হয়েছে' : 'নম্বর কপি'}
+              {copiedType === 'bkash' ? <Check size={12} /> : <Copy size={12} />}
+              {copiedType === 'bkash' ? 'কপি হয়েছে' : 'Copy'}
+            </button>
+          </div>
+
+          {/* Nagad Card */}
+          <div className="p-3 bg-white border border-orange-100 rounded-2xl shadow-sm space-y-2">
+            <div className="text-[10px] font-black text-orange-600 tracking-wide uppercase">
+              NAGAD [PERSONAL]
+            </div>
+            <div className="text-sm font-black text-slate-800 tracking-tight">
+              {currentData.nagadPhone}
+            </div>
+            <button
+              type="button"
+              onClick={() => handleCopy(currentData.nagadPhone, 'nagad')}
+              className="w-full py-1.5 px-2 rounded-xl border border-orange-100 text-[11px] font-bold text-orange-600 bg-orange-50/50 flex items-center justify-center gap-1 active:scale-95 transition-all"
+            >
+              {copiedType === 'nagad' ? <Check size={12} /> : <Copy size={12} />}
+              {copiedType === 'nagad' ? 'কপি হয়েছে' : 'Copy'}
             </button>
           </div>
         </div>
 
-        {/* Validate inputs */}
+        {/*পেমেন্ট গেটওয়ে মেথড সিলেক্টর ট্যাব (bKash / Nagad) */}
+        <div className="grid grid-cols-2 gap-2 p-1 bg-slate-50 border border-slate-100 rounded-xl">
+          <button
+            type="button"
+            onClick={() => setSelectedMethod('bkash')}
+            className={`py-2 px-3 text-xs font-black rounded-lg transition-all ${selectedMethod === 'bkash'
+              ? 'bg-white text-purple-700 shadow-sm border border-purple-100'
+              : 'text-slate-500 hover:text-slate-800'
+              }`}
+          >
+            bKash
+          </button>
+          <button
+            type="button"
+            onClick={() => setSelectedMethod('nagad')}
+            className={`py-2 px-3 text-xs font-black rounded-lg transition-all ${selectedMethod === 'nagad'
+              ? 'bg-white text-purple-700 shadow-sm border border-purple-100'
+              : 'text-slate-500 hover:text-slate-800'
+              }`}
+          >
+            Nagad
+          </button>
+        </div>
+
+        {/* Validate inputs Form */}
         <form onSubmit={handleVerify} className="space-y-4">
           {errorMsg && (
             <div className="p-3 bg-rose-50 border border-rose-100 text-rose-600 text-xs font-bold rounded-xl text-center">
@@ -201,65 +232,81 @@ export default function AddMoneyFlow({ user, onAddMoneySuccess, onBack }: AddMon
 
           {successMsg && (
             <div className="p-4 bg-emerald-50 border border-emerald-100 text-emerald-700 text-xs font-bold rounded-xl text-center flex flex-col items-center gap-2">
-              <Check size={20} className="text-emerald-600 animate-bounce" />
+              <Check size={20} className="text-emerald-600" />
               <span>{successMsg}</span>
             </div>
           )}
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="space-y-4">
+            {/* Sender Number / Method Context */}
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-600 block">কত টাকা সেন্ড করেছেন?</label>
+              <label className="text-xs font-bold text-slate-600 block">
+                Sender Number ({selectedMethod === 'bkash' ? 'bKash' : 'Nagad'})
+              </label>
               <div className="relative">
                 <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400">
-                  <Coins size={16} />
+                  <span className="text-xs font-bold">#</span>
                 </span>
                 <input
                   type="number"
-                  placeholder={`যেমন: ${activeWallet.minAmount}`}
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                  className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-400 text-sm text-slate-800 font-extrabold"
+                  placeholder="01XXXXXXXXX"
+                  className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-400 text-sm text-slate-800 font-medium"
                 />
               </div>
             </div>
 
+            {/* Transaction ID */}
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-600 block">Transaction ID (TrxID)</label>
+              <label className="text-xs font-bold text-slate-600 block">Transaction ID</label>
               <div className="relative">
                 <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400">
                   <Send size={16} className="-rotate-45" />
                 </span>
                 <input
                   type="text"
-                  placeholder="যেমন: 8N7X2M9K"
+                  placeholder="TRX1234567"
                   value={txId}
                   onChange={(e) => setTxId(e.target.value)}
-                  className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-400 text-sm text-slate-800 font-extrabold uppercase placeholder:lowercase"
+                  className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-400 text-sm text-slate-800 font-extrabold uppercase"
+                />
+              </div>
+            </div>
+
+            {/* Amount Input */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-slate-600 block">টাকার পরিমাণ (৳)</label>
+              <div className="relative">
+                <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400">
+                  <Coins size={16} />
+                </span>
+                <input
+                  type="number"
+                  placeholder={`সর্বনিম্ন ${currentData.minAmount} টাকা`}
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-400 text-sm text-slate-800 font-extrabold"
                 />
               </div>
             </div>
           </div>
 
-          <div className="p-3 bg-purple-50/50 border border-purple-100/30 rounded-2xl flex items-start gap-2.5 text-[11px] text-purple-700">
-            <Info size={14} className="shrink-0 mt-0.5 text-pink-500" />
-            <p>
-              নিরাপদ পেমেন্ট গেটওয়ে। আপনি পেমেন্ট করার পর ট্রানজেকশন ID এবং এমাউন্ট সাবমিট করলেই ৫-১০ সেকেন্ডে আপনার ব্যালেন্সে টাকা অটোমেটিক ক্র্যাডিত হবে।
-            </p>
-          </div>
 
-          <div className="grid grid-cols-2 gap-3 pt-2">
+
+          {/* Action Buttons */}
+          <div className="space-y-2.5 pt-2">
+            <button
+              type="submit"
+              className="w-full py-3.5 rounded-xl bg-gradient-to-r from-purple-600 to-[#502894] text-white font-extrabold text-xs shadow-lg active:scale-98 transition-all flex items-center justify-center gap-1.5"
+            >
+              ⚡ তাৎক্ষনিক ভেরিফাই করুন
+            </button>
+
             <button
               type="button"
               onClick={onBack}
-              className="py-3.5 rounded-xl border border-purple-100 font-extrabold text-xs text-purple-700 hover:bg-slate-50 active:scale-98 transition-all"
+              className="w-full py-3 rounded-xl border border-slate-200 font-extrabold text-xs text-slate-600 bg-white hover:bg-slate-50 active:scale-98 transition-all flex items-center justify-center gap-1"
             >
-              ড্যাশবোর্ডে ফিরে যান
-            </button>
-            <button
-              type="submit"
-              className="py-3.5 rounded-xl bg-gradient-to-r from-purple-700 to-[#3a1c71] text-white font-extrabold text-xs hover:opacity-95 shadow-lg shadow-purple-100 active:scale-98 transition-all flex items-center justify-center gap-1.5"
-            >
-              Verify Payment
+              ↩ ড্যাশবোর্ডে ফিরে যান
             </button>
           </div>
         </form>
