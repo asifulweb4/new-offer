@@ -1,0 +1,6 @@
+{
+  "name": "Nagarik Seba",
+  "description": "A premium Bangladeshi mobile operator pack and recharge wallet app featuring elegant purple-pink-white theme, seamless payment flows, and exclusive operator portals.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
