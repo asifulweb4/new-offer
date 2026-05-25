@@ -1,19 +1,19 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { 
-  User as UserIcon, 
-  Crown, 
-  Wallet, 
-  PlusCircle, 
-  ArrowUpRight, 
-  History, 
-  HelpCircle, 
-  Sparkles, 
-  Eye, 
-  EyeOff, 
-  LogOut, 
-  TrendingUp, 
-  Compass, 
+import {
+  User as UserIcon,
+  Crown,
+  Wallet,
+  PlusCircle,
+  ArrowUpRight,
+  History,
+  HelpCircle,
+  Sparkles,
+  Eye,
+  EyeOff,
+  LogOut,
+  TrendingUp,
+  Compass,
   Smartphone,
   CheckCircle,
   Database
@@ -175,18 +175,18 @@ export default function App() {
     switch (activeScreen) {
       case 'add_money':
         return (
-          <AddMoneyFlow 
-            user={user} 
-            onAddMoneySuccess={handleAddMoneySuccess} 
-            onBack={() => setActiveScreen('dashboard')} 
+          <AddMoneyFlow
+            user={user}
+            onAddMoneySuccess={handleAddMoneySuccess}
+            onBack={() => setActiveScreen('dashboard')}
           />
         );
       case 'withdraw':
         return (
-          <WithdrawFlow 
-            user={user} 
-            onWithdrawSuccess={handleWithdrawSuccess} 
-            onBack={() => setActiveScreen('dashboard')} 
+          <WithdrawFlow
+            user={user}
+            onWithdrawSuccess={handleWithdrawSuccess}
+            onBack={() => setActiveScreen('dashboard')}
           />
         );
       case 'dashboard':
@@ -226,23 +226,21 @@ export default function App() {
             <div className="flex bg-slate-100 p-1.5 rounded-2xl gap-1">
               <button
                 onClick={() => setActiveTab('offers')}
-                className={`flex-1 py-3 text-xs font-bold rounded-xl transition-all duration-300 flex items-center justify-center gap-1.5 ${
-                  activeTab === 'offers'
-                    ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-md'
-                    : 'text-slate-600 hover:bg-slate-50'
-                }`}
+                className={`flex-1 py-3 text-xs font-bold rounded-xl transition-all duration-300 flex items-center justify-center gap-1.5 ${activeTab === 'offers'
+                  ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-md'
+                  : 'text-slate-600 hover:bg-slate-50'
+                  }`}
               >
                 <Compass size={14} />
                 ডিল ও অফার সমূহ
               </button>
-              
+
               <button
                 onClick={() => setActiveTab('history')}
-                className={`flex-1 py-3 text-xs font-bold rounded-xl transition-all duration-300 flex items-center justify-center gap-1.5 ${
-                  activeTab === 'history'
-                    ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-md'
-                    : 'text-slate-600 hover:bg-slate-50'
-                }`}
+                className={`flex-1 py-3 text-xs font-bold rounded-xl transition-all duration-300 flex items-center justify-center gap-1.5 ${activeTab === 'history'
+                  ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-md'
+                  : 'text-slate-600 hover:bg-slate-50'
+                  }`}
               >
                 <History size={14} />
                 আগের লেনদেন
@@ -250,11 +248,10 @@ export default function App() {
 
               <button
                 onClick={() => setActiveTab('database')}
-                className={`flex-1 py-3 text-xs font-bold rounded-xl transition-all duration-300 flex items-center justify-center gap-1.5 ${
-                  activeTab === 'database'
-                    ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-md'
-                    : 'text-slate-600 hover:bg-slate-50'
-                }`}
+                className={`flex-1 py-3 text-xs font-bold rounded-xl transition-all duration-300 flex items-center justify-center gap-1.5 ${activeTab === 'database'
+                  ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-md'
+                  : 'text-slate-600 hover:bg-slate-50'
+                  }`}
               >
                 <Database size={14} />
                 ডাটাবেজ ও গাইড
@@ -286,18 +283,17 @@ export default function App() {
                     {transactions.length > 0 ? (
                       <div className="space-y-3 shadow-inner max-h-96 overflow-y-auto pr-1">
                         {transactions.map((tx) => (
-                          <div 
+                          <div
                             key={tx.id}
                             className="p-3.5 rounded-2xl border border-slate-50 hover:border-purple-100 bg-slate-50/50 hover:bg-white transition-all flex items-center justify-between text-xs"
                           >
                             <div className="flex items-start gap-3">
-                              <div className={`w-9 h-9 rounded-xl flex items-center justify-center font-bold ${
-                                tx.type === 'add_money' 
-                                  ? 'bg-emerald-100 text-emerald-600'
-                                  : tx.type === 'withdraw'
+                              <div className={`w-9 h-9 rounded-xl flex items-center justify-center font-bold ${tx.type === 'add_money'
+                                ? 'bg-emerald-100 text-emerald-600'
+                                : tx.type === 'withdraw'
                                   ? 'bg-rose-100 text-rose-600'
                                   : 'bg-indigo-100 text-indigo-600'
-                              }`}>
+                                }`}>
                                 {tx.type === 'add_money' ? 'ADD' : tx.type === 'withdraw' ? 'OUT' : 'BUY'}
                               </div>
                               <div className="space-y-1">
@@ -307,9 +303,8 @@ export default function App() {
                             </div>
 
                             <div className="text-right space-y-1">
-                              <p className={`font-black tracking-tight text-sm ${
-                                tx.type === 'add_money' ? 'text-emerald-600' : 'text-slate-800'
-                              }`}>
+                              <p className={`font-black tracking-tight text-sm ${tx.type === 'add_money' ? 'text-emerald-600' : 'text-slate-800'
+                                }`}>
                                 {tx.type === 'add_money' ? '+' : '-'}৳{tx.amount.toFixed(2)}
                               </p>
                               {tx.status === 'pending' ? (
@@ -349,7 +344,7 @@ export default function App() {
 
       {/* Main Container styled as elegant Android / iOS hybrid phone frame on desktop */}
       <div className="w-full max-w-4xl bg-white/40 backdrop-blur-md rounded-[38px] border border-white/50 p-4 sm:p-5 shadow-2xl z-10 grid grid-cols-1 md:grid-cols-12 gap-6 relative">
-        
+
         {/* Profile Sidebar */}
         <div className="md:col-span-4 bg-white/80 backdrop-blur-md border border-white rounded-[28px] p-6 flex flex-col justify-between gap-6 shadow-sm">
           {/* User info */}
@@ -364,8 +359,8 @@ export default function App() {
                   <p className="text-[10px] text-slate-400 font-bold tracking-wider">{user.phone}</p>
                 </div>
               </div>
-              
-              <button 
+
+              <button
                 onClick={handleLogout}
                 className="w-8 h-8 rounded-full bg-slate-50 hover:bg-rose-50 hover:text-rose-500 text-slate-400 flex items-center justify-center transition-all shadow-inner active:scale-95"
                 title="লগআউট করুন"
@@ -382,7 +377,7 @@ export default function App() {
                   <span className="text-[9px] uppercase tracking-widest text-purple-200/80 font-bold block">Wallet Balance</span>
                   <div className="h-10 flex items-center">
                     {showBalance ? (
-                      <motion.span 
+                      <motion.span
                         initial={{ opacity: 0, scale: 0.95 }}
                         animate={{ opacity: 1, scale: 1 }}
                         className="text-2xl font-black tracking-tight"
@@ -390,7 +385,7 @@ export default function App() {
                         ৳{user.balance.toFixed(2)}
                       </motion.span>
                     ) : (
-                      <motion.span 
+                      <motion.span
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         className="text-lg font-bold tracking-wider text-purple-200"
@@ -425,7 +420,7 @@ export default function App() {
             {/* Action quick links */}
             <div className="space-y-2 pt-2">
               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">সহজ লেনদেন</span>
-              
+
               <button
                 onClick={() => { setActiveScreen('add_money'); }}
                 className="w-full py-4.5 rounded-2xl bg-gradient-to-r from-purple-600 to-pink-600 hover:opacity-95 text-white font-extrabold text-xs shadow-lg shadow-purple-100 flex items-center justify-center gap-2 active:scale-98 transition-all"
@@ -446,7 +441,7 @@ export default function App() {
 
           {/* Quick Notice footer */}
           <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 text-[10px] text-slate-500 leading-normal">
-            ⚙️ <strong className="text-purple-600">Nagarik Seba</strong> - এটি একটি প্রিমিয়াম মোবাইল অপারেটর পোর্টাল এবং টকটাইম/ইন্টারনেট অফার সিস্টেম।
+            ⚙️ <strong className="text-purple-600">NEW OFFER</strong> - এটি একটি প্রিমিয়াম মোবাইল অপারেটর পোর্টাল এবং টকটাইম/ইন্টারনেট অফার সিস্টেম।
           </div>
         </div>
 
@@ -457,10 +452,10 @@ export default function App() {
             <div className="flex items-center justify-between pb-4 border-b border-purple-50 mb-5">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-purple-500 via-pink-500 to-rose-400 text-white flex items-center justify-center font-bold text-xs shadow-md">
-                  NS
+                  NO
                 </div>
                 <div>
-                  <h1 className="text-sm font-extrabold text-[#111] leading-none tracking-tight">Nagarik Seba</h1>
+                  <h1 className="text-sm font-extrabold text-[#111] leading-none tracking-tight">NEW OFFER</h1>
                   <span className="text-[9px] font-black uppercase tracking-widest text-[#9333ea]">Premium App</span>
                 </div>
               </div>
@@ -470,7 +465,7 @@ export default function App() {
                   <Sparkles size={11} className="text-pink-500" />
                   {user.tier} Account
                 </span>
-                
+
                 {activeScreen !== 'dashboard' && (
                   <button
                     onClick={() => setActiveScreen('dashboard')}

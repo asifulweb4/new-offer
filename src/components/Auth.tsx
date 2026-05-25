@@ -360,7 +360,7 @@ export default function Auth({ onLogin }: AuthProps) {
                     </span>
                     <input
                       type="text"
-                      placeholder="যেমন: আসিফুল ইসলাম"
+                      placeholder=""
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                       className="w-full pl-11 pr-4 py-3.5 bg-purple-50/50 border border-purple-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-pink-400 focus:bg-white text-slate-800 text-sm font-medium transition-all"
